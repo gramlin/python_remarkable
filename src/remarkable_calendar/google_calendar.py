@@ -22,6 +22,7 @@ class CalendarEvent:
     end: datetime
     location: str | None
     description: str | None
+    calendar_name: str | None = None
 
     @property
     def is_all_day(self) -> bool:
@@ -54,6 +55,11 @@ def get_all_calendar_ids(service: object) -> list[str]:
     return [cal['id'] for cal in calendar_list.get('items', [])]
 
 
+def get_calendar_names(service: object) -> dict[str, str]:
+    calendar_list = service.calendarList().list().execute()
+    return {cal['id']: cal.get('summary', cal['id']) for cal in calendar_list.get('items', [])}
+
+
 def fetch_week_events(
     service: object,
     calendar_ids: list[str],
@@ -62,6 +68,7 @@ def fetch_week_events(
 ) -> list[CalendarEvent]:
     all_events = []
     week_end = week_start + timedelta(days=7)
+    calendar_names = get_calendar_names(service)
     for calendar_id in calendar_ids:
         events_result = (
             service.events()
@@ -74,6 +81,7 @@ def fetch_week_events(
             )
             .execute()
         )
+        calendar_name = calendar_names.get(calendar_id, calendar_id)
         for item in events_result.get("items", []):
             start = _parse_event_datetime(item["start"], timezone)
             end = _parse_event_datetime(item["end"], timezone)
@@ -84,6 +92,7 @@ def fetch_week_events(
                     end=end,
                     location=item.get("location"),
                     description=item.get("description"),
+                    calendar_name=calendar_name,
                 )
             )
     return all_events

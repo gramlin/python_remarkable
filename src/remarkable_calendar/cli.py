@@ -98,16 +98,6 @@ def parse_args() -> argparse.Namespace:
         default="rm_api.log",
         help="Sökväg till rm_api log-fil (default: rm_api.log).",
     )
-    parser.add_argument(
-        "--rm-sync-dir",
-        default="sync",
-        help="Katalog där rm_api sparar sync-cache (default: sync).",
-    )
-    parser.add_argument(
-        "--rm-log-file",
-        default="rm_api.log",
-        help="Loggfil för rm_api (default: rm_api.log).",
-    )
     return parser.parse_args()
 
 
@@ -121,7 +111,14 @@ def serialize_events(
     week_start: datetime,
     timezone: ZoneInfo,
 ) -> dict:
-    grouped = group_events_by_day(events, timezone)
+    # Filter out week number calendars
+    filtered_events = [
+        event for event in events 
+        if not (event.calendar_name and 
+                ("veckonummer" in event.calendar_name.lower() or 
+                 "week number" in event.calendar_name.lower()))
+    ]
+    grouped = group_events_by_day(filtered_events, timezone)
     days = []
     for offset in range(7):
         current_day = week_start + timedelta(days=offset)
@@ -137,6 +134,7 @@ def serialize_events(
                 {
                     "summary": event.summary,
                     "time": time_label,
+                    "calendar": event.calendar_name,
                     "location": event.location,
                     "description": event.description,
                 }
