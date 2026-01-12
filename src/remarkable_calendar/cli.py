@@ -76,12 +76,37 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--upload",
         action="store_true",
-        help="Ladda upp PDF till ReMarkable via rmapi.",
+        help="Ladda upp PDF till ReMarkable via rm_api.",
     )
     parser.add_argument(
         "--remote-dir",
         default=None,
         help="Mapp i ReMarkable där PDF ska laddas upp.",
+    )
+    parser.add_argument(
+        "--rm-token-file",
+        default="token",
+        help="Sökväg till rm_api-tokenfil (default: token).",
+    )
+    parser.add_argument(
+        "--rm-sync-dir",
+        default="sync",
+        help="Sökväg till rm_api sync-katalog (default: sync).",
+    )
+    parser.add_argument(
+        "--rm-log-file",
+        default="rm_api.log",
+        help="Sökväg till rm_api log-fil (default: rm_api.log).",
+    )
+    parser.add_argument(
+        "--rm-sync-dir",
+        default="sync",
+        help="Katalog där rm_api sparar sync-cache (default: sync).",
+    )
+    parser.add_argument(
+        "--rm-log-file",
+        default="rm_api.log",
+        help="Loggfil för rm_api (default: rm_api.log).",
     )
     return parser.parse_args()
 
@@ -171,7 +196,13 @@ def main() -> None:
     )
 
     if args.upload:
-        upload_pdf_with_rmapi(output_path, args.remote_dir)
+        upload_pdf_with_rmapi(
+            output_path,
+            args.remote_dir,
+            token_file=args.rm_token_file,
+            sync_dir=args.rm_sync_dir,
+            log_file=args.rm_log_file,
+        )
 
     print(f"Skapade PDF: {output_path}")
 

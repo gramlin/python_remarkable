@@ -14,10 +14,7 @@ med en Typst-mall och laddar upp PDF:en till ReMarkable Cloud.
 - [Typst](https://typst.app/docs/reference/cli/)
   - För Windows: Ladda ner från [releases](https://github.com/typst/typst/releases) och lägg till i PATH.
   - För WSL/Linux: `wget https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz && tar -xf typst-x86_64-unknown-linux-musl.tar.xz && sudo mv typst /usr/local/bin/`
-- [rmapi](https://github.com/juruen/rmapi) (för uppladdning till ReMarkable)
-  - För Linux/WSL: `wget https://github.com/juruen/rmapi/releases/latest/download/rmapi-linux-x64.deb && sudo dpkg -i rmapi-linux-x64.deb` (om det inte fungerar, ladda ner manuellt från [releases](https://github.com/juruen/rmapi/releases), eller bygg från källa: `git clone https://github.com/juruen/rmapi.git && cd rmapi && go build && sudo mv rmapi /usr/local/bin/`, eller installera via Go: `go install github.com/juruen/rmapi@latest`)
-  - För Windows: Ladda ner `rmapi-windows-x64.zip` från [releases](https://github.com/juruen/rmapi/releases) och lägg till i PATH.
-  - Notera: Detta är ett separat verktyg, inte ett Python-paket – installera inte via pip.
+- [rm_api](https://pypi.org/project/rm-api/) (för uppladdning till ReMarkable)
 - Google Calendar API-uppgifter (`credentials.json`)
 
 ### Installera
@@ -72,14 +69,15 @@ pipenv run python -m remarkable_calendar \
 
 …eller via env var: `TYPST_BIN=/path/to/typst`.
 
-För uppladdning till ReMarkable:
+För uppladdning till ReMarkable (kräver att du har en rm_api-tokenfil, t.ex. `token`):
 
 ```bash
 pipenv run python -m remarkable_calendar \
   --week 2024-04-08 \
   --all-calendars \
   --upload \
-  --remote-dir /Kalender
+  --remote-dir /Kalender \
+  --rm-token-file token
 ```
 
 ### Anpassa Typst-mallen
