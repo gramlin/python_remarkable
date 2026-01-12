@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+TEMP_SUFFIXES = {".tmp", ".temp", ".part"}
+
 from rm_api import API, models
 
 
@@ -74,3 +76,17 @@ def upload_pdf_with_rmapi(
         # Create new document
         document = models.Document.new_pdf(api, pdf_path.name, pdf_data, parent=parent_uuid)
         api.upload(document)
+
+    cleanup_sync_temp_files(sync_dir)
+
+
+def cleanup_sync_temp_files(sync_dir: str) -> None:
+    sync_path = Path(sync_dir)
+    if not sync_path.exists():
+        return
+    for path in sync_path.rglob("*"):
+        if path.is_file() and path.suffix.lower() in TEMP_SUFFIXES:
+            path.unlink()
+    for path in sorted(sync_path.rglob("*"), reverse=True):
+        if path.is_dir() and not any(path.iterdir()):
+            path.rmdir()

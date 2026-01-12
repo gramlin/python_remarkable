@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 from remarkable_calendar.google_calendar import (
     CalendarEvent,
+    fetch_events_in_range,
     fetch_week_events,
     get_all_calendar_ids,
     get_calendar_service,
@@ -60,7 +61,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--template",
-        default="templates/week.typ",
+        default=None,
         help="Sökväg till Typst-mall.",
     )
     parser.add_argument(
@@ -72,6 +73,21 @@ def parse_args() -> argparse.Namespace:
         "--output",
         default=None,
         help="Sökväg till genererad PDF. Standard blir output/YYYY-WW.pdf",
+    )
+    parser.add_argument(
+        "--summary",
+        action="store_true",
+        help="Skapa en veckosummering med summary.typ.",
+    )
+    parser.add_argument(
+        "--summary-start",
+        default=None,
+        help="Startdatum för veckosummering (YYYY-MM-DD).",
+    )
+    parser.add_argument(
+        "--summary-end",
+        default=None,
+        help="Slutdatum för veckosummering (YYYY-MM-DD). Om utelämnad används en vecka.",
     )
     parser.add_argument(
         "--upload",
@@ -106,9 +122,10 @@ def week_start_for(date_value: date, timezone: ZoneInfo) -> datetime:
     return datetime.combine(start, datetime.min.time(), tzinfo=timezone)
 
 
-def serialize_events(
+def serialize_events_for_range(
     events: Iterable[CalendarEvent],
-    week_start: datetime,
+    range_start: datetime,
+    range_end: datetime,
     timezone: ZoneInfo,
 ) -> dict:
     # Filter out week number calendars
@@ -120,8 +137,9 @@ def serialize_events(
     ]
     grouped = group_events_by_day(filtered_events, timezone)
     days = []
-    for offset in range(7):
-        current_day = week_start + timedelta(days=offset)
+    total_days = (range_end.date() - range_start.date()).days + 1
+    for offset in range(total_days):
+        current_day = range_start + timedelta(days=offset)
         key = current_day.date().isoformat()
         day_events = grouped.get(key, [])
         formatted = []
@@ -142,14 +160,14 @@ def serialize_events(
         days.append(
             {
                 "date": key,
-                "weekday": WEEKDAY_NAMES[offset],
+                "weekday": WEEKDAY_NAMES[current_day.weekday()],
                 "events": formatted,
             }
         )
-    week_number = week_start.isocalendar().week
+    week_number = range_start.isocalendar().week
     return {
-        "week_start": week_start.date().isoformat(),
-        "week_end": (week_start + timedelta(days=6)).date().isoformat(),
+        "week_start": range_start.date().isoformat(),
+        "week_end": range_end.date().isoformat(),
         "week_number": week_number,
         "days": days,
     }
@@ -164,30 +182,85 @@ def resolve_output_path(output_arg: str | None, week_start: datetime) -> Path:
     return output_dir / f"{year}-{week:02d}.pdf"
 
 
+def resolve_summary_output_path(
+    output_arg: str | None,
+    range_start: datetime,
+) -> Path:
+    if output_arg:
+        return Path(output_arg)
+    year, week, _ = range_start.isocalendar()
+    output_dir = Path(str(year))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir / f"Veckosummering vecka {year}{week:02d}.pdf"
+
+
+def parse_date_arg(value: str, label: str) -> date:
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise ValueError(f"Ogiltigt {label}. Använd formatet YYYY-MM-DD.") from exc
+
+
+def resolve_template_path(template_arg: str | None, use_summary: bool) -> Path:
+    if template_arg:
+        return Path(template_arg)
+    return Path("templates/summary.typ" if use_summary else "templates/week.typ")
+
+
+def serialize_events(
+    events: Iterable[CalendarEvent],
+    week_start: datetime,
+    timezone: ZoneInfo,
+) -> dict:
+    return serialize_events_for_range(events, week_start, week_start + timedelta(days=6), timezone)
+
+
 def main() -> None:
     args = parse_args()
     timezone = ZoneInfo(args.timezone)
-    if args.week:
-        date_value = datetime.strptime(args.week, "%Y-%m-%d").date()
+    use_summary = args.summary or args.summary_start or args.summary_end
+    if use_summary:
+        if not args.summary_start:
+            raise ValueError("Ange --summary-start för veckosummering.")
+        start_date = parse_date_arg(args.summary_start, "startdatum")
+        if args.summary_end:
+            end_date = parse_date_arg(args.summary_end, "slutdatum")
+        else:
+            end_date = start_date + timedelta(days=6)
+        if end_date < start_date:
+            raise ValueError("Slutdatum måste vara samma som eller efter startdatum.")
+        range_start = datetime.combine(start_date, datetime.min.time(), tzinfo=timezone)
+        range_end = datetime.combine(end_date, datetime.min.time(), tzinfo=timezone)
+        template_path = resolve_template_path(args.template, use_summary=True)
+        output_path = resolve_summary_output_path(args.output, range_start)
     else:
-        date_value = datetime.now(timezone).date()
-
-    week_start = week_start_for(date_value, timezone)
+        if args.week:
+            date_value = datetime.strptime(args.week, "%Y-%m-%d").date()
+        else:
+            date_value = datetime.now(timezone).date()
+        week_start = week_start_for(date_value, timezone)
+        range_start = week_start
+        range_end = week_start + timedelta(days=6)
+        template_path = resolve_template_path(args.template, use_summary=False)
+        output_path = resolve_output_path(args.output, week_start)
 
     service = get_calendar_service(Path(args.credentials), Path(args.token))
     if args.all_calendars:
         calendar_ids = get_all_calendar_ids(service)
     else:
         calendar_ids = [args.calendar_id]
-    events = fetch_week_events(service, calendar_ids, week_start, timezone)
+    if use_summary:
+        events = fetch_events_in_range(service, calendar_ids, range_start, range_end, timezone)
+        data = serialize_events_for_range(events, range_start, range_end, timezone)
+    else:
+        events = fetch_week_events(service, calendar_ids, range_start, timezone)
+        data = serialize_events(events, range_start, timezone)
 
-    data = serialize_events(events, week_start, timezone)
-    output_path = resolve_output_path(args.output, week_start)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     data_path = output_path.with_suffix(".json")
     data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     compile_typst(
-        Path(args.template),
+        template_path,
         data_path,
         output_path,
         config=TypstConfig(typst_bin=args.typst_bin),

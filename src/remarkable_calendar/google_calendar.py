@@ -60,22 +60,23 @@ def get_calendar_names(service: object) -> dict[str, str]:
     return {cal['id']: cal.get('summary', cal['id']) for cal in calendar_list.get('items', [])}
 
 
-def fetch_week_events(
+def fetch_events_in_range(
     service: object,
     calendar_ids: list[str],
-    week_start: datetime,
+    range_start: datetime,
+    range_end: datetime,
     timezone: ZoneInfo,
 ) -> list[CalendarEvent]:
     all_events = []
-    week_end = week_start + timedelta(days=7)
+    range_end_exclusive = range_end + timedelta(days=1)
     calendar_names = get_calendar_names(service)
     for calendar_id in calendar_ids:
         events_result = (
             service.events()
             .list(
                 calendarId=calendar_id,
-                timeMin=week_start.isoformat(),
-                timeMax=week_end.isoformat(),
+                timeMin=range_start.isoformat(),
+                timeMax=range_end_exclusive.isoformat(),
                 singleEvents=True,
                 orderBy="startTime",
             )
@@ -96,6 +97,16 @@ def fetch_week_events(
                 )
             )
     return all_events
+
+
+def fetch_week_events(
+    service: object,
+    calendar_ids: list[str],
+    week_start: datetime,
+    timezone: ZoneInfo,
+) -> list[CalendarEvent]:
+    week_end = week_start + timedelta(days=6)
+    return fetch_events_in_range(service, calendar_ids, week_start, week_end, timezone)
 
 
 def group_events_by_day(events: Iterable[CalendarEvent], timezone: ZoneInfo) -> dict[str, list[CalendarEvent]]:
