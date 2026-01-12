@@ -12,7 +12,7 @@ med en Typst-mall och laddar upp PDF:en till ReMarkable Cloud.
 - Python 3.11+
 - [Pipenv](https://pipenv.pypa.io/)
 - [Typst](https://typst.app/docs/reference/cli/)
-- [rmapi](https://github.com/juruen/rmapi) (för uppladdning till ReMarkable)
+- [rm_api](https://pypi.org/project/rm-api/) (för uppladdning till ReMarkable)
 - Google Calendar API-uppgifter (`credentials.json`)
 
 ### Installera
@@ -43,13 +43,14 @@ pipenv run python -m remarkable_calendar \
   --output output/kalender.pdf
 ```
 
-För uppladdning till ReMarkable:
+För uppladdning till ReMarkable (kräver att du har en rm_api-tokenfil, t.ex. `token`):
 
 ```bash
 pipenv run python -m remarkable_calendar \
   --week 2024-04-08 \
   --upload \
-  --remote-dir /Kalender
+  --remote-dir /Kalender \
+  --rm-token-file token
 ```
 
 ### Anpassa Typst-mallen
