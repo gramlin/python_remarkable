@@ -49,38 +49,44 @@ def get_calendar_service(credentials_path: Path, token_path: Path) -> object:
     return build("calendar", "v3", credentials=creds)
 
 
+def get_all_calendar_ids(service: object) -> list[str]:
+    calendar_list = service.calendarList().list().execute()
+    return [cal['id'] for cal in calendar_list.get('items', [])]
+
+
 def fetch_week_events(
     service: object,
-    calendar_id: str,
+    calendar_ids: list[str],
     week_start: datetime,
     timezone: ZoneInfo,
 ) -> list[CalendarEvent]:
+    all_events = []
     week_end = week_start + timedelta(days=7)
-    events_result = (
-        service.events()
-        .list(
-            calendarId=calendar_id,
-            timeMin=week_start.isoformat(),
-            timeMax=week_end.isoformat(),
-            singleEvents=True,
-            orderBy="startTime",
-        )
-        .execute()
-    )
-    events = []
-    for item in events_result.get("items", []):
-        start = _parse_event_datetime(item["start"], timezone)
-        end = _parse_event_datetime(item["end"], timezone)
-        events.append(
-            CalendarEvent(
-                summary=item.get("summary", "(utan titel)"),
-                start=start,
-                end=end,
-                location=item.get("location"),
-                description=item.get("description"),
+    for calendar_id in calendar_ids:
+        events_result = (
+            service.events()
+            .list(
+                calendarId=calendar_id,
+                timeMin=week_start.isoformat(),
+                timeMax=week_end.isoformat(),
+                singleEvents=True,
+                orderBy="startTime",
             )
+            .execute()
         )
-    return events
+        for item in events_result.get("items", []):
+            start = _parse_event_datetime(item["start"], timezone)
+            end = _parse_event_datetime(item["end"], timezone)
+            all_events.append(
+                CalendarEvent(
+                    summary=item.get("summary", "(utan titel)"),
+                    start=start,
+                    end=end,
+                    location=item.get("location"),
+                    description=item.get("description"),
+                )
+            )
+    return all_events
 
 
 def group_events_by_day(events: Iterable[CalendarEvent], timezone: ZoneInfo) -> dict[str, list[CalendarEvent]]:

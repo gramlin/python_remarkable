@@ -10,11 +10,12 @@ from zoneinfo import ZoneInfo
 from remarkable_calendar.google_calendar import (
     CalendarEvent,
     fetch_week_events,
+    get_all_calendar_ids,
     get_calendar_service,
     group_events_by_day,
 )
 from remarkable_calendar.remarkable import upload_pdf_with_rmapi
-from remarkable_calendar.typst import compile_typst
+from remarkable_calendar.typst import TypstConfig, compile_typst
 
 WEEKDAY_NAMES = [
     "Måndag",
@@ -38,6 +39,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--calendar-id", default="primary", help="Google Calendar ID")
     parser.add_argument(
+        "--all-calendars",
+        action="store_true",
+        help="Hämta händelser från alla kalendrar istället för bara en specifik.",
+    )
+    parser.add_argument(
         "--timezone",
         default="Europe/Stockholm",
         help="Tidszon för vecka och tider.",
@@ -58,9 +64,14 @@ def parse_args() -> argparse.Namespace:
         help="Sökväg till Typst-mall.",
     )
     parser.add_argument(
+        "--typst-bin",
+        default=None,
+        help="Sökväg till Typst-binär (om 'typst' inte finns i PATH). Kan även sättas via TYPST_BIN.",
+    )
+    parser.add_argument(
         "--output",
         default=None,
-        help="Sökväg till genererad PDF. Standard blir output/week-YYYY-WW.pdf",
+        help="Sökväg till genererad PDF. Standard blir output/YYYY-WW.pdf",
     )
     parser.add_argument(
         "--upload",
@@ -126,7 +137,8 @@ def resolve_output_path(output_arg: str | None, week_start: datetime) -> Path:
         return Path(output_arg)
     output_dir = Path("output")
     output_dir.mkdir(parents=True, exist_ok=True)
-    return output_dir / f"week-{week_start.date().isoformat()}-v{week_start.isocalendar().week}.pdf"
+    year, week, _ = week_start.isocalendar()
+    return output_dir / f"{year}-{week:02d}.pdf"
 
 
 def main() -> None:
@@ -140,14 +152,23 @@ def main() -> None:
     week_start = week_start_for(date_value, timezone)
 
     service = get_calendar_service(Path(args.credentials), Path(args.token))
-    events = fetch_week_events(service, args.calendar_id, week_start, timezone)
+    if args.all_calendars:
+        calendar_ids = get_all_calendar_ids(service)
+    else:
+        calendar_ids = [args.calendar_id]
+    events = fetch_week_events(service, calendar_ids, week_start, timezone)
 
     data = serialize_events(events, week_start, timezone)
     output_path = resolve_output_path(args.output, week_start)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     data_path = output_path.with_suffix(".json")
     data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    compile_typst(Path(args.template), data_path, output_path)
+    compile_typst(
+        Path(args.template),
+        data_path,
+        output_path,
+        config=TypstConfig(typst_bin=args.typst_bin),
+    )
 
     if args.upload:
         upload_pdf_with_rmapi(output_path, args.remote_dir)

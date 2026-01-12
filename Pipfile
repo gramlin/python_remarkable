@@ -10,7 +10,7 @@ google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 python-dateutil = "*"
 requests = "*"
-remarkable-calendar = {path = ".", editable = true}
+remarkable-calendar = {file = ".", editable = true}
 
 [requires]
 python_version = "3.11"
