@@ -37,6 +37,8 @@ pipenv install -e .
 
 ### Kör
 
+#### Veckokalender
+
 ```bash
 pipenv run python -m remarkable_calendar \
   --week 2024-04-08 \
@@ -52,6 +54,33 @@ pipenv run python -m remarkable_calendar \
   --week 2024-04-08 \
   --all-calendars \
   --timezone Europe/Stockholm
+```
+
+#### Veckosummering
+
+Summering kan genereras för valfri period. Du anger startdatum (krävs) och ev. slutdatum.
+Om slutdatum utelämnas används en vecka (7 dagar) från startdatum.
+
+```bash
+pipenv run python -m remarkable_calendar \
+  --summary \
+  --summary-start 2024-04-08 \
+  --summary-end 2024-04-14 \
+  --timezone Europe/Stockholm
+```
+
+#### Snabbskript för senaste veckan
+
+Det finns två shellscript i projektets rot som genererar senaste veckan. De skickar vidare
+alla extra argument till Python-kommandot, så du kan t.ex. lägga till `--upload` eller
+`--all-calendars`.
+
+```bash
+./run_last_week_calendar.sh --timezone Europe/Stockholm
+```
+
+```bash
+./run_last_week_summary.sh --timezone Europe/Stockholm
 ```
 
 Om du får felet att `typst` inte hittas:
@@ -82,4 +111,4 @@ pipenv run python -m remarkable_calendar \
 
 ### Anpassa Typst-mallen
 
-Redigera `templates/week.typ` för att ändra layouten på PDF:en.
+Redigera `templates/week.typ` eller `templates/summary.typ` för att ändra layouten på PDF:en.
