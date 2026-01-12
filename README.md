@@ -21,6 +21,12 @@ med en Typst-mall och laddar upp PDF:en till ReMarkable Cloud.
 pipenv install
 ```
 
+Installera projektet i editable-läge (behövs för `python -m remarkable_calendar`):
+
+```bash
+pipenv install -e .
+```
+
 ### Google Calendar OAuth
 
 1. Skapa OAuth-klient i Google Cloud Console.
