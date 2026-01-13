@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Iterable
@@ -16,6 +17,7 @@ from remarkable_calendar.google_calendar import (
     group_events_by_day,
 )
 from remarkable_calendar.remarkable import upload_pdf_with_rmapi
+from remarkable_calendar.todoist import fetch_projects, fetch_tasks
 from remarkable_calendar.typst import TypstConfig, compile_typst
 
 WEEKDAY_NAMES = [
@@ -113,6 +115,31 @@ def parse_args() -> argparse.Namespace:
         "--rm-log-file",
         default="rm_api.log",
         help="Sökväg till rm_api log-fil (default: rm_api.log).",
+    )
+    parser.add_argument(
+        "--todoist",
+        action="store_true",
+        help="Skapa Todoist-listor som PDF.",
+    )
+    parser.add_argument(
+        "--todoist-token",
+        default=None,
+        help="Todoist API-token (alternativt via TODOIST_API_TOKEN).",
+    )
+    parser.add_argument(
+        "--todoist-projects",
+        default="Personligt,Arbete,Cure,Handla",
+        help="Kommaseparerad lista med Todoist-projekt som ska exporteras.",
+    )
+    parser.add_argument(
+        "--todoist-template",
+        default="templates/todoist.typ",
+        help="Sökväg till Typst-mall för Todoist-listor.",
+    )
+    parser.add_argument(
+        "--todoist-output-dir",
+        default="output/todoist",
+        help="Katalog för genererade Todoist-PDF:er.",
     )
     return parser.parse_args()
 
@@ -215,8 +242,85 @@ def serialize_events(
     return serialize_events_for_range(events, week_start, week_start + timedelta(days=6), timezone)
 
 
+def _slugify_filename(value: str) -> str:
+    safe = "".join(char if char.isalnum() or char in ("-", "_") else "-" for char in value)
+    return "-".join(filter(None, safe.split("-"))).strip("-") or "todoist"
+
+
+def _resolve_todoist_token(arg_value: str | None) -> str:
+    token = arg_value or os.environ.get("TODOIST_API_TOKEN")
+    if not token:
+        raise ValueError("Todoist-token saknas. Ange --todoist-token eller TODOIST_API_TOKEN.")
+    return token
+
+
+def _parse_todoist_projects(value: str) -> list[str]:
+    return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def generate_todoist_documents(args: argparse.Namespace) -> None:
+    token = _resolve_todoist_token(args.todoist_token)
+    project_names = _parse_todoist_projects(args.todoist_projects)
+    if not project_names:
+        raise ValueError("Ange minst ett Todoist-projekt i --todoist-projects.")
+
+    projects = fetch_projects(token)
+    project_lookup = {project.name.casefold(): project for project in projects}
+
+    missing = [name for name in project_names if name.casefold() not in project_lookup]
+    if missing:
+        raise ValueError(
+            "Hittade inte följande Todoist-projekt: "
+            + ", ".join(missing)
+            + ". Kontrollera projektnamnen i Todoist."
+        )
+
+    template_path = Path(args.todoist_template)
+    output_dir = Path(args.todoist_output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for name in project_names:
+        project = project_lookup[name.casefold()]
+        tasks = fetch_tasks(token, project.project_id)
+        data = {
+            "project_name": project.name,
+            "generated_at": datetime.now().isoformat(timespec="minutes"),
+            "items": [
+                {
+                    "content": task.content,
+                    "description": task.description,
+                    "due": task.due,
+                }
+                for task in tasks
+            ],
+        }
+        output_path = output_dir / f"{_slugify_filename(project.name)}.pdf"
+        data_path = output_path.with_suffix(".json")
+        data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        compile_typst(
+            template_path,
+            data_path,
+            output_path,
+            config=TypstConfig(typst_bin=args.typst_bin),
+        )
+
+        if args.upload:
+            upload_pdf_with_rmapi(
+                output_path,
+                args.remote_dir,
+                token_file=args.rm_token_file,
+                sync_dir=args.rm_sync_dir,
+                log_file=args.rm_log_file,
+            )
+
+        print(f"Skapade Todoist-PDF: {output_path}")
+
+
 def main() -> None:
     args = parse_args()
+    if args.todoist:
+        generate_todoist_documents(args)
+        return
     timezone = ZoneInfo(args.timezone)
     use_summary = args.summary or args.summary_start or args.summary_end
     if use_summary:
