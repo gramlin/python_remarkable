@@ -1,0 +1,81 @@
+{
+  "week_start": "2026-01-05",
+  "week_end": "2026-01-11",
+  "week_number": 2,
+  "days": [
+    {
+      "date": "2026-01-05",
+      "weekday": "Måndag",
+      "events": [
+        {
+          "summary": "Trettondagsafton (halva dagen)",
+          "time": "Hela dagen",
+          "calendar": "Helgdagar i Sverige",
+          "location": null,
+          "description": "Allmän helgdag\nDetta är en halv ledig dag."
+        }
+      ]
+    },
+    {
+      "date": "2026-01-06",
+      "weekday": "Tisdag",
+      "events": [
+        {
+          "summary": "Trettondedag jul",
+          "time": "Hela dagen",
+          "calendar": "Helgdagar i Sverige",
+          "location": null,
+          "description": "Allmän helgdag"
+        }
+      ]
+    },
+    {
+      "date": "2026-01-07",
+      "weekday": "Onsdag",
+      "events": [
+        {
+          "summary": "Optimizing OnPrem Deployments: A Deep Dive into BMC Helix’s Latest Releases",
+          "time": "16:00–17:00",
+          "calendar": "Privat",
+          "location": "https://events.bmc.com/Optimizing-OnPrem-Deployments-Jan/v/e?i=7HQ-EIwIhBKyN1KqYh4hM_X38F8aaxpj_1765963546",
+          "description": "<p class=\"paragraph\"><span style=\"font-size:12pt;\"><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><span style=\"font-size:14pt;\">Join us for an in-depth webinar showcasing the latest innovations introduced in BMC Helix OnPrem with releases <strong>25.3</strong> and <strong>25.4</strong>. This session is designed for architects, administrators, and technical stakeholders looking to understand how the newest capabilities can streamline deployment, enhance security, and reduce operational overhead across their Helix environments.</span></span></span></span></p><p class=\"paragraph\"><span style=\"font-size:12pt;\"><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><span style=\"font-size:14pt;\">We will walk through a comprehensive overview of new features and enhancements, including:</span></span></span></span></p><p class=\"paragraph\"><span style=\"font-size:12pt;\"><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"> </span></span></span></p><ul>\t<li class=\"paragraph\" style=\"margin-left:8px;\"><span style=\"font-size:12pt;\"><span><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><strong><span style=\"font-size:14pt;\">New technology support</span></strong><span style=\"font-size:14pt;\"> that expands compatibility and ensures your OnPrem ecosystem remains aligned with modern infrastructure standards.</span></span></span></span></span></li>\t<li class=\"paragraph\" style=\"margin-left:8px;\"><span style=\"font-size:12pt;\"><span><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><strong><span style=\"font-size:14pt;\">Minimized footprint deployment options</span></strong><span style=\"font-size:14pt;\">, such as the <em>ITSM Core Flavor</em> and the associated <strong>design partnership program</strong>, as well as targeted <strong>PCS deployments</strong> focused on delivering only the services you need.</span></span></span></span></span></li>\t<li class=\"paragraph\" style=\"margin-left:8px;\"><span style=\"font-size:12pt;\"><span><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><strong><span style=\"font-size:14pt;\">New functionality and product support</span></strong><span style=\"font-size:14pt;\"> for OnPrem environments, including <strong>BHAC</strong>, <strong>HelixGPT</strong>, and updated deployment flows for both Core and Full ITSM flavors. We will also cover the new <strong>autofix flow, </strong>improvements to the <strong>Health Check Tool (HCT)</strong> and <strong>DTR cleanup script. </strong></span></span></span></span></span></li>\t<li class=\"paragraph\" style=\"margin-left:8px;\"><span style=\"font-size:12pt;\"><span><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><strong><span style=\"font-size:14pt;\">New sizing options</span></strong><span style=\"font-size:14pt;\">, featuring expanded documentation and the introduction of the <strong>ITOM XS sizing category</strong> to better support smaller-scale deployments.</span></span></span></span></span></li>\t<li class=\"paragraph\" style=\"margin-left:8px;\"><span style=\"font-size:12pt;\"><span><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><strong><span style=\"font-size:14pt;\">Enhanced security features</span></strong><span style=\"font-size:14pt;\">, including <strong>mTLS</strong>, certificate-based authentication, improved certificate handling, and support for multiple identity providers.</span></span></span></span></span></li></ul><p class=\"paragraph\"><span style=\"font-size:12pt;\"><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"> </span></span></span><span style=\"font-size:12pt;\"><span style=\"vertical-align:baseline;\"><span style=\"font-family:Calibri, sans-serif;\"><span style=\"font-size:14pt;\">Whether you are planning an upgrade or looking to optimize your existing environment, this webinar will offer valuable insights to help you get the most out of the latest BMC Helix OnPrem deployment capabilities. We look forward to your participation.</span></span></span></span></p><p class=\"paragraph\"> </p>"
+        },
+        {
+          "summary": "Optimizing OnPrem Deployments: A Deep Dive into BMC Helix’s Latest Releases",
+          "time": "16:00–17:00",
+          "calendar": "Privat",
+          "location": "https://bmc.zoom.us/w/96181186847?tk=IKK2pGjlcvEFbJ9pgKnbFkU63C8QJ_wVv5sSg09Mg7k.DQkAAAAWZNhxHxZKQkxaY09fYlNNeUtZeW43dVdsMFl3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&pwd=UR5WBClGVAfWxN4b7JMBRij7KGmbIB.1&uuid=WN_mhyVg7MtRvaJBGVTwAulhQ",
+          "description": "Topic: Optimizing OnPrem Deployments: A Deep Dive into BMC Helix’s Latest Releases\n\nJoin from PC, Mac, iPad, or Android:\nhttps://bmc.zoom.us/w/96181186847?tk=IKK2pGjlcvEFbJ9pgKnbFkU63C8QJ_wVv5sSg09Mg7k.DQkAAAAWZNhxHxZKQkxaY09fYlNNeUtZeW43dVdsMFl3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&pwd=UR5WBClGVAfWxN4b7JMBRij7KGmbIB.1&uuid=WN_mhyVg7MtRvaJBGVTwAulhQ\nPasscode:275090\n\nPhone one-tap:\n+16469313860,,96181186847#,,,,*275090# US\n+16694449171,,96181186847#,,,,*275090# US\n\nJoin via audio:\n+1 646 931 3860 US\n+1 669 444 9171 US\n+1 669 900 6833 US (San Jose)\n+1 689 278 1000 US\n+1 719 359 4580 US\n+1 929 205 6099 US (New York)\n+1 253 205 0468 US\n+1 253 215 8782 US (Tacoma)\n+1 301 715 8592 US (Washington DC)\n+1 305 224 1968 US\n+1 309 205 3325 US\n+1 312 626 6799 US (Chicago)\n+1 346 248 7799 US (Houston)\n+1 360 209 5623 US\n+1 386 347 5053 US\n+1 507 473 4847 US\n+1 564 217 2000 US\nWebinar ID: 961 8118 6847\nPasscode: 275090\nInternational numbers available: https://bmc.zoom.us/u/aMeCekhd4\n\n\nJoin from an H.323/SIP room system:\nH.323: \n144.195.19.161 (US West)\n206.247.11.121 (US East)\n115.114.131.7 (India Mumbai)\n115.114.115.7 (India Hyderabad)\n159.124.15.191 (Amsterdam Netherlands)\n159.124.47.249 (Germany)\n159.124.104.213 (Australia Sydney)\n159.124.74.212 (Australia Melbourne)\n170.114.134.121 (Hong Kong SAR)\n170.114.180.219 (Singapore)\n64.211.144.160 (Brazil)\n159.124.132.243 (Mexico)\n159.124.168.213 (Canada Toronto)\n159.124.196.25 (Canada Vancouver)\n170.114.194.163 (Japan Tokyo)\n147.124.100.25 (Japan Osaka)\nMeeting ID: 961 8118 6847\nPasscode: 275090\nSIP: 96181186847@zoomcrc.com\nPasscode: 275090\n"
+        }
+      ]
+    },
+    {
+      "date": "2026-01-08",
+      "weekday": "Torsdag",
+      "events": []
+    },
+    {
+      "date": "2026-01-09",
+      "weekday": "Fredag",
+      "events": []
+    },
+    {
+      "date": "2026-01-10",
+      "weekday": "Lördag",
+      "events": []
+    },
+    {
+      "date": "2026-01-11",
+      "weekday": "Söndag",
+      "events": [
+        {
+          "summary": "Titta på lägenhet i Uppsala Visning S:t Johannesgatan 7 E",
+          "time": "16:00–16:30",
+          "calendar": "Familjen",
+          "location": "S:t Johannesgatan 7 E, Fjärdingen, Uppsala kommun",
+          "description": "Välkommen på öppen visning!För mer info se https://www.hemnet.se/bostad/lagenhet-6rum-fjardingen-uppsala-kommun-s-t-johannesgatan-7-e-21657387Eller kontakta Linn Thyrestam Grape, 070-355 22 55"
+        }
+      ]
+    }
+  ]
+}

@@ -8,4 +8,7 @@ pipenv run python -m remarkable_calendar \
   --summary \
   --summary-start "$summary_start" \
   --summary-end "$summary_end" \
+  --all-calendars \
+  --upload \
+  --remote-dir /Kalender/Veckosummering \
   "$@"
