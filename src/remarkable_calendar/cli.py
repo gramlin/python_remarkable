@@ -141,7 +141,7 @@ def serialize_events_for_range(
     for offset in range(total_days):
         current_day = range_start + timedelta(days=offset)
         key = current_day.date().isoformat()
-        day_events = grouped.get(key, [])
+        day_events = sorted(grouped.get(key, []), key=lambda e: e.start)
         formatted = []
         for event in day_events:
             if event.is_all_day:

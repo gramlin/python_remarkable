@@ -7,5 +7,5 @@ pipenv run python -m remarkable_calendar \
   --week "$week_date" \
   --all-calendars \
   --upload \
-  --remote-dir /Kalender \
+  --remote-dir / \
   "$@"
