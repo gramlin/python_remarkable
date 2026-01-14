@@ -15,7 +15,7 @@
 
 #let checkbox-fill = luma(96%)
 #let checkbox-radius = 0.1em
-#let checkbox-scale = 125%
+#let checkbox-scale = 150%
 
 // Note: `radius` only controls corner rounding. Size is hardcoded to 0.8em in cheq,
 // so to get larger boxes we scale the marker symbols.
