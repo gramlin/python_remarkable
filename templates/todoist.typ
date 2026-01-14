@@ -1,4 +1,4 @@
-#import "@preview/cheq:0.3.0": checklist
+#import "@preview/cheq:0.3.0": checklist, unchecked-sym, checked-sym, incomplete-sym, canceled-sym
 
 #let data = json(sys.inputs.data)
 
@@ -13,7 +13,31 @@
 #let muted = rgb(107, 114, 128)
 #let line = rgb(229, 231, 235)
 
-#show: checklist.with(fill: luma(96%), stroke: line, radius: 0.2em)
+#let checkbox-fill = luma(96%)
+#let checkbox-radius = 0.1em
+#let checkbox-scale = 125%
+
+// Note: `radius` only controls corner rounding. Size is hardcoded to 0.8em in cheq,
+// so to get larger boxes we scale the marker symbols.
+#show: checklist.with(
+  fill: checkbox-fill,
+  stroke: line,
+  radius: checkbox-radius,
+  marker-map: (
+    " ": scale(x: checkbox-scale, y: checkbox-scale)[
+      #unchecked-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
+    ],
+    "x": scale(x: checkbox-scale, y: checkbox-scale)[
+      #checked-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
+    ],
+    "/": scale(x: checkbox-scale, y: checkbox-scale)[
+      #incomplete-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
+    ],
+    "-": scale(x: checkbox-scale, y: checkbox-scale)[
+      #canceled-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
+    ],
+  ),
+)
 
 #let header(title) = [
   #text(size: 22pt, weight: 800, fill: ink)[#title]
