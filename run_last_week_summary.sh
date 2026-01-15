@@ -10,5 +10,5 @@ pipenv run python -m remarkable_calendar \
   --summary-end "$summary_end" \
   --all-calendars \
   --upload \
-  --remote-dir /Kalender/Veckosummering \
+  --remote-dir "/01 Planering/2026 Arki" \
   "$@"

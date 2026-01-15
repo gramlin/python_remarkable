@@ -281,7 +281,10 @@ def generate_todoist_documents(args: argparse.Namespace) -> None:
 
     for name in project_names:
         project = project_lookup[name.casefold()]
+        print(f"\nBearbetar projekt: {project.name}")
+        print(f"Hämtar uppgifter från Todoist...")
         tasks = fetch_tasks(token, project.project_id)
+        print(f"Hittade {len(tasks)} uppgifter")
         data = {
             "project_name": project.name,
             "generated_at": datetime.now().isoformat(timespec="minutes"),
@@ -296,15 +299,19 @@ def generate_todoist_documents(args: argparse.Namespace) -> None:
         }
         output_path = output_dir / f"{_slugify_filename(project.name)}.pdf"
         data_path = output_path.with_suffix(".json")
+        print(f"Sparar data till: {data_path}")
         data_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"Kompilerar PDF med Typst...")
         compile_typst(
             template_path,
             data_path,
             output_path,
             config=TypstConfig(typst_bin=args.typst_bin),
         )
+        print(f"✓ PDF skapad: {output_path}")
 
         if args.upload:
+            print(f"\nLaddar upp till reMarkable...")
             upload_pdf_with_rmapi(
                 output_path,
                 args.remote_dir,
@@ -312,8 +319,6 @@ def generate_todoist_documents(args: argparse.Namespace) -> None:
                 sync_dir=args.rm_sync_dir,
                 log_file=args.rm_log_file,
             )
-
-        print(f"Skapade Todoist-PDF: {output_path}")
 
 
 def main() -> None:

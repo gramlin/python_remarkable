@@ -18,6 +18,8 @@ def _find_or_create_remote_dir(api, remote_dir: str | None) -> str | None:
     if not parts:
         return None
 
+    if parts:
+        print(f"Skapar/kontrollerar mapp: /{'/'.join(parts)}")
     api.get_documents()
     parent_uuid: str | None = None
     for part in parts:
@@ -47,10 +49,12 @@ def upload_pdf_with_rmapi(
     sync_dir: str = "sync",
     log_file: str = "rm_api.log",
 ) -> None:
+    print(f"Ansluter till reMarkable Cloud...")
     api = API(token_file_path=token_file, sync_file_path=sync_dir, log_file=log_file)
     parent_uuid = _find_or_create_remote_dir(api, remote_dir)
     
     # Check if document already exists (try both with and without .pdf extension)
+    print(f"Kontrollerar om '{pdf_path.name}' redan finns...")
     api.get_documents()
     file_name_with_ext = pdf_path.name  # e.g., "2026-03.pdf"
     file_name_without_ext = pdf_path.stem  # e.g., "2026-03"
@@ -69,14 +73,22 @@ def upload_pdf_with_rmapi(
     
     if existing:
         # Delete existing and create new (rm_api doesn't support direct PDF update)
+        print(f"Dokument finns redan. Raderar gammalt dokument...")
         api.delete(existing)
+        print(f"Skapar nytt dokument...")
         document = models.Document.new_pdf(api, pdf_path.name, pdf_data, parent=parent_uuid)
+        print(f"Laddar upp till reMarkable Cloud...")
         api.upload(document)
+        print(f"✓ Dokument uppdaterat: {pdf_path.name}")
     else:
         # Create new document
+        print(f"Skapar nytt dokument...")
         document = models.Document.new_pdf(api, pdf_path.name, pdf_data, parent=parent_uuid)
+        print(f"Laddar upp till reMarkable Cloud...")
         api.upload(document)
+        print(f"✓ Dokument uppladdat: {pdf_path.name}")
 
+    print(f"Städar temporära filer...")
     cleanup_sync_temp_files(sync_dir)
 
 

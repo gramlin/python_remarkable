@@ -1,5 +1,3 @@
-#import "@preview/cheq:0.3.0": checklist, unchecked-sym, checked-sym, incomplete-sym, canceled-sym
-
 #let data = json(sys.inputs.data)
 
 #set page(
@@ -13,31 +11,26 @@
 #let muted = rgb(107, 114, 128)
 #let line = rgb(229, 231, 235)
 
-#let checkbox-fill = luma(96%)
-#let checkbox-radius = 0.1em
-#let checkbox-scale = 150%
-
-// Note: `radius` only controls corner rounding. Size is hardcoded to 0.8em in cheq,
-// so to get larger boxes we scale the marker symbols.
-#show: checklist.with(
-  fill: checkbox-fill,
-  stroke: line,
-  radius: checkbox-radius,
-  marker-map: (
-    " ": scale(x: checkbox-scale, y: checkbox-scale)[
-      #unchecked-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
-    ],
-    "x": scale(x: checkbox-scale, y: checkbox-scale)[
-      #checked-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
-    ],
-    "/": scale(x: checkbox-scale, y: checkbox-scale)[
-      #incomplete-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
-    ],
-    "-": scale(x: checkbox-scale, y: checkbox-scale)[
-      #canceled-sym(fill: checkbox-fill, stroke: line, radius: checkbox-radius)
-    ],
-  ),
-)
+// Egen checkbox-funktion med stora rutor
+#let checkbox(checked: false) = {
+  let size = 1.5em
+  let stroke-width = 1.5pt
+  
+  box(
+    width: size,
+    height: size,
+    baseline: size / 2 - 0.6em,
+    stroke: (paint: rgb(0, 0, 0), thickness: stroke-width),
+    radius: 2pt,
+    fill: rgb(255, 255, 255),
+  )[
+    #if checked [
+      #place(center + horizon)[
+        #text(size: 0.9em, weight: "bold")[✓]
+      ]
+    ]
+  ]
+}
 
 #let header(title) = [
   #text(size: 22pt, weight: 800, fill: ink)[#title]
@@ -55,6 +48,7 @@
   ]
   #if item.description != none and item.description != "" [
     #v(2pt)
+    #set par(leading: 0.5em)
     #text(size: 9pt, fill: muted)[#item.description]
   ]
 ]
@@ -70,6 +64,14 @@
   #text(fill: muted, style: "italic")[Inga uppgifter i listan.]
 ] else [
   #for item in data.items [
-    - [ ] #item_body(item)
+    #block(spacing: 0.8em)[
+      #grid(
+        columns: (auto, 1fr),
+        column-gutter: 0.7em,
+        row-gutter: 0em,
+        [#checkbox()],
+        [#item_body(item)]
+      )
+    ]
   ]
 ]
